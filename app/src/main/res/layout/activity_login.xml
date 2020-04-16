@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".login.SingUpActivity"
+    android:background="@android:color/black"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/welcome_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:textSize="25sp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="25dp"
+        android:layout_centerHorizontal="true"
+        android:text="@string/welcome_to_simplechat" />
+
+    <EditText
+        android:id="@+id/email_edit_text"
+        android:background="@drawable/rounded_edittext"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:hint="@string/email"
+        android:textColor="@android:color/white"
+        android:textColorHint="@android:color/white"
+        android:layout_below="@id/welcome_text_view"
+        android:layout_marginTop="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <EditText
+        android:id="@+id/password_edit_text"
+        android:background="@drawable/rounded_edittext"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:hint="@string/password"
+        android:textColor="@android:color/white"
+        android:textColorHint="@android:color/white"
+        android:layout_below = "@id/email_edit_text"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <EditText
+        android:id="@+id/confirm_password_edit_text"
+        android:background="@drawable/rounded_edittext"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:hint="@string/confirm_password"
+        android:textColor="@android:color/white"
+        android:textColorHint="@android:color/white"
+        android:layout_below = "@id/password_edit_text"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <EditText
+        android:id="@+id/name_edit_text"
+        android:background="@drawable/rounded_edittext"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
+        android:hint="@string/name"
+        android:textColor="@android:color/white"
+        android:textColorHint="@android:color/white"
+        android:layout_below="@id/confirm_password_edit_text"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/sign_up_button"
+        android:layout_below="@id/name_edit_text"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/rounded_edittext"
+        android:textColor="@android:color/white"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sing_up" />
+
+    <TextView
+        android:id="@+id/switch_sing_in_sign_up"
+        android:layout_below="@id/sign_up_button"
+        android:layout_marginTop="25dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:layout_centerHorizontal="true"
+        android:textSize="16sp"
+        android:clickable="true"
+        android:onClick="switchSingUpInMode"
+        android:text="@string/tap_to_sing_in"
+        android:focusable="true" />
+</RelativeLayout>

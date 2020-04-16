@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">SimpleChat</string>
+    <string name="user">User</string>
+    <string name="message">Message</string>
+    <string name="send_message">Send</string>
+    <string name="title_activity_login">Sign in</string>
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Sing Up failed"</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="name">Name</string>
+    <string name="sing_up">Sing Up</string>
+    <string name="sing_ip">Sing In</string>
+    <string name="welcome_to_simplechat">Welcome to SimpleChat!</string>
+    <string name="tap_to_sing_up"><u>Tap to Sing Up</u></string>
+    <string name="tap_to_sing_in"><u>Tap to Sing In</u></string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="sing_out">Sing Out</string>
+</resources>
