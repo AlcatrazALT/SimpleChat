@@ -40,7 +40,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
 
         Message message = getItem(position);
 
-        boolean isTextSend = message.getPhotoUlr() == null;
+        boolean isTextSend = message.getImageUlr() == null;
         if(isTextSend){
             photoImageView.setVisibility(View.GONE);
             messageTextView.setVisibility(View.VISIBLE);
@@ -49,7 +49,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
             messageTextView.setVisibility(View.GONE);
             photoImageView.setVisibility(View.VISIBLE);
             Glide.with(photoImageView.getContext())
-                    .load(message.getPhotoUlr()).into(photoImageView);
+                    .load(message.getImageUlr()).into(photoImageView);
         }
 
         userTextView.setText(message.getUserName());

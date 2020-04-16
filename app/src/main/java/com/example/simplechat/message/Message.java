@@ -4,15 +4,15 @@ public class Message {
 
     String userName;
     String text;
-    String photoUlr;
+    String imageUlr;
 
     public Message() {
     }
 
-    public Message(String userName, String text, String photoUlr) {
+    public Message(String userName, String text, String imageUlr) {
         this.userName = userName;
         this.text = text;
-        this.photoUlr = photoUlr;
+        this.imageUlr = imageUlr;
     }
 
     public String getUserName() {
@@ -31,11 +31,11 @@ public class Message {
         this.text = text;
     }
 
-    public String getPhotoUlr() {
-        return photoUlr;
+    public String getImageUlr() {
+        return imageUlr;
     }
 
-    public void setPhotoUlr(String photoUlr) {
-        this.photoUlr = photoUlr;
+    public void setImageUlr(String imageUlr) {
+        this.imageUlr = imageUlr;
     }
 }

@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -23,17 +24,24 @@ import com.example.simplechat.login.SingUpActivity;
 import com.example.simplechat.message.Message;
 import com.example.simplechat.message.MessageAdapter;
 import com.example.simplechat.user.User;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int RC_IMAGE_PICKER = 300;
 
     private ListView messageListView;
     private MessageAdapter messageAdapter;
@@ -46,11 +54,13 @@ public class MainActivity extends AppCompatActivity {
     List<Message> messageList;
 
     FirebaseDatabase database;
-    DatabaseReference messageDBReference;
+    DatabaseReference messageDBRef;
     ChildEventListener messageChildDBEventListener;
-
-    DatabaseReference userDBReference;
+    DatabaseReference userDBRef;
     ChildEventListener userChildDBEventListener;
+
+    FirebaseStorage firebaseStorage;
+    StorageReference chatImageStorageRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +68,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         createMainActivitySetup();
+
+        createFireBaseSetup();
+
+        createFirebaseStorageSetup();
 
         setUserNameInChat();
 
@@ -67,7 +81,10 @@ public class MainActivity extends AppCompatActivity {
 
         setupMessageEditText();
 
-        createFireBaseSetup();
+    }
+
+    private void createFirebaseStorageSetup() {
+        chatImageStorageRef = firebaseStorage.getReference().child("chat_images");
     }
 
     private void setUserNameInChat() {
@@ -112,6 +129,54 @@ public class MainActivity extends AppCompatActivity {
         sendImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                startActivityForResult(Intent.createChooser(intent,
+                        "Choose an image"),
+                        RC_IMAGE_PICKER);
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == RC_IMAGE_PICKER && resultCode == RESULT_OK){
+            Uri selectedImageUri = data.getData();
+            final StorageReference imageStorageRef = chatImageStorageRef
+                    .child(selectedImageUri.getLastPathSegment());
+
+            UploadTask uploadTask = imageStorageRef.putFile(selectedImageUri);
+
+            getDownloadURL(imageStorageRef, uploadTask);
+        }
+    }
+
+    private void getDownloadURL(final StorageReference imageStorageRef, UploadTask uploadTask) {
+        Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+            @Override
+            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                if (!task.isSuccessful()) {
+                    throw task.getException();
+                }
+
+                // Continue with the task to get the download URL
+                return imageStorageRef.getDownloadUrl();
+            }
+        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+            @Override
+            public void onComplete(@NonNull Task<Uri> task) {
+                if (task.isSuccessful()) {
+                    Uri downloadUri = task.getResult();
+                    Message message = new Message();
+                    message.setImageUlr(downloadUri.toString());
+                    message.setUserName(userName);
+                    messageDBRef.push().setValue(message);
+                } else {
+                    // Handle failures
+                    // ...
+                }
             }
         });
     }
@@ -125,7 +190,7 @@ public class MainActivity extends AppCompatActivity {
                         messageEditText.getText().toString(),
                         null);
 
-                messageDBReference.push().setValue(message);
+                messageDBRef.push().setValue(message);
                 messageEditText.setText("");
             }
         });
@@ -140,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createUserChildDB() {
-        userDBReference = database.getReference().child("user");
+        userDBRef = database.getReference().child("user");
         userChildDBEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
@@ -171,11 +236,11 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
-        userDBReference.addChildEventListener(userChildDBEventListener);
+        userDBRef.addChildEventListener(userChildDBEventListener);
     }
 
     private void createMessageChildDB() {
-        messageDBReference = database.getReference().child("message");
+        messageDBRef = database.getReference().child("message");
         messageChildDBEventListener = new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot,
@@ -207,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
-        messageDBReference.addChildEventListener(messageChildDBEventListener);
+        messageDBRef.addChildEventListener(messageChildDBEventListener);
     }
 
     private void createMainActivitySetup() {
