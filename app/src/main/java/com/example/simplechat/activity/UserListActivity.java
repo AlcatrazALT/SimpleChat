@@ -6,11 +6,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import com.example.simplechat.R;
 import com.example.simplechat.user.User;
 import com.example.simplechat.user.UserAdapter;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -26,6 +31,8 @@ public class UserListActivity extends AppCompatActivity {
     private RecyclerView userRecyclerView;
     private RecyclerView.LayoutManager userLayoutManager;
     private UserAdapter userAdapter;
+
+    FirebaseAuth mAuth;
     private DatabaseReference userDBRef;
     private ChildEventListener userChildDBEventListener;
 
@@ -34,21 +41,31 @@ public class UserListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_list);
 
+        createFirebaseSetup();
+
         attachUserDBRefListener();
+
         buildRecyclerView();
 
     }
 
-    private void attachUserDBRefListener() {
+    private void createFirebaseSetup() {
+        mAuth = FirebaseAuth.getInstance();
         userDBRef = FirebaseDatabase.getInstance().getReference().child("user");
+    }
+
+    private void attachUserDBRefListener() {
         if(userChildDBEventListener == null){
             userChildDBEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                     User user = dataSnapshot.getValue(User.class);
-                    user.setAvatarResource(R.drawable.ic_person_white_50dp);
-                    userList.add(user);
-                    userAdapter.notifyDataSetChanged();
+
+                    if(!user.getId().equals(mAuth.getCurrentUser().getUid())){
+                        user.setAvatarResource(R.drawable.ic_person_white_50dp);
+                        userList.add(user);
+                        userAdapter.notifyDataSetChanged();
+                    }
                 }
 
                 @Override
@@ -84,5 +101,22 @@ public class UserListActivity extends AppCompatActivity {
         userRecyclerView.setHasFixedSize(true);
         userRecyclerView.setLayoutManager(userLayoutManager);
         userRecyclerView.setAdapter(userAdapter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.sing_out) {
+            FirebaseAuth.getInstance().signOut();
+            startActivity(new Intent(UserListActivity.this, SingUpActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
