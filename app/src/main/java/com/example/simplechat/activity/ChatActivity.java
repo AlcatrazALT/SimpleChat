@@ -51,16 +51,20 @@ public class ChatActivity extends AppCompatActivity {
     private EditText messageEditText;
 
     private String userName;
-    List<Message> messageList;
+    private String recipientUserId;
+    private String recipientUserName;
 
-    FirebaseDatabase database;
-    DatabaseReference messageDBRef;
-    ChildEventListener messageChildDBEventListener;
-    DatabaseReference userDBRef;
-    ChildEventListener userChildDBEventListener;
+    private List<Message> messageList;
 
-    FirebaseStorage firebaseStorage;
-    StorageReference chatImageStorageRef;
+    private FirebaseAuth auth;
+    private FirebaseDatabase database;
+    private DatabaseReference messageDBRef;
+    private ChildEventListener messageChildDBEventListener;
+    private DatabaseReference userDBRef;
+    private ChildEventListener userChildDBEventListener;
+
+    private FirebaseStorage firebaseStorage;
+    private StorageReference chatImageStorageRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +77,7 @@ public class ChatActivity extends AppCompatActivity {
 
         createFirebaseStorageSetup();
 
-        setUserNameInChat();
+        setInfoToChat();
 
         useSendTextMessageButton();
 
@@ -88,56 +92,15 @@ public class ChatActivity extends AppCompatActivity {
         chatImageStorageRef = firebaseStorage.getReference().child("chat_images");
     }
 
-    private void setUserNameInChat() {
+    private void setInfoToChat() {
         Intent intent = getIntent();
         if(intent != null){
             userName = intent.getStringExtra("userName");
-        } else{
-            userName = "Default User";
+            recipientUserId = intent.getStringExtra("recipientUserId");
+            recipientUserName = intent.getStringExtra("recipientUserName");
         }
-    }
 
-    private void setupMessageEditText() {
-        messageEditText.setFilters(new InputFilter[]
-                {new InputFilter.LengthFilter(130)});
-
-        messageEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start,
-                                          int count, int after) {
-
-                if (s.toString().trim().length() > 0) {
-                    sendMessageButton.setEnabled(true);
-                } else {
-                    sendMessageButton.setEnabled(false);
-                }
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start,
-                                      int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-    }
-
-    private void useSendImageButton() {
-        sendImageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
-                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-                startActivityForResult(Intent.createChooser(intent,
-                        "Choose an image"),
-                        RC_IMAGE_PICKER);
-            }
-        });
+        setTitle(recipientUserName);
     }
 
     @Override
@@ -170,9 +133,12 @@ public class ChatActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<Uri> task) {
                 if (task.isSuccessful()) {
                     Uri downloadUri = task.getResult();
-                    Message message = new Message();
-                    message.setImageUlr(downloadUri.toString());
-                    message.setUserName(userName);
+                    Message message = new Message(
+                            userName,
+                            downloadUri.toString(),
+                            auth.getCurrentUser().getUid(),
+                            recipientUserId);
+
                     messageDBRef.push().setValue(message);
                 } else {
                     // Handle failures
@@ -189,7 +155,9 @@ public class ChatActivity extends AppCompatActivity {
                 Message message = new Message(
                         userName,
                         messageEditText.getText().toString(),
-                        null);
+                        null,
+                        auth.getCurrentUser().getUid(),
+                        recipientUserId);
 
                 messageDBRef.push().setValue(message);
                 messageEditText.setText("");
@@ -197,8 +165,52 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
+    private void useSendImageButton() {
+        sendImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.setType("image/*");
+                intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+                startActivityForResult(Intent.createChooser(intent,
+                        "Choose an image"),
+                        RC_IMAGE_PICKER);
+            }
+        });
+    }
+
+    private void setupMessageEditText() {
+        messageEditText.setFilters(new InputFilter[]
+                {new InputFilter.LengthFilter(130)});
+
+        messageEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) {
+
+                if (s.toString().trim().length() > 0) {
+                    sendMessageButton.setEnabled(true);
+                } else {
+                    sendMessageButton.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start,
+                                      int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+    }
+
     private void createFireBaseSetup() {
         database = FirebaseDatabase.getInstance();
+        auth = FirebaseAuth.getInstance();
 
         createMessageChildDB();
 
@@ -247,8 +259,19 @@ public class ChatActivity extends AppCompatActivity {
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot,
                                      @Nullable String s) {
                 Message message = dataSnapshot.getValue(Message.class);
-
-                messageAdapter.add(message);
+                if(message.getSender().equals((auth.getCurrentUser().getUid()))
+                        &&
+                        message.getRecipient().equals(recipientUserId))
+                {
+                    message.setSenderSide(true);
+                    messageAdapter.add(message);
+                }else if(message.getRecipient().equals((auth.getCurrentUser().getUid()))
+                        &&
+                        message.getSender().equals(recipientUserId))
+                {
+                    message.setSenderSide(false);
+                    messageAdapter.add(message);
+                }
             }
 
             @Override
@@ -291,6 +314,7 @@ public class ChatActivity extends AppCompatActivity {
 
         messageListView.setAdapter(messageAdapter);
         progressBar.setVisibility(ProgressBar.INVISIBLE);
+
     }
 
     @Override

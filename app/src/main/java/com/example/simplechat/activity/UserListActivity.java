@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import com.example.simplechat.R;
+import com.example.simplechat.user.OnUserClickListener;
 import com.example.simplechat.user.User;
 import com.example.simplechat.user.UserAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,8 +32,9 @@ public class UserListActivity extends AppCompatActivity {
     private RecyclerView userRecyclerView;
     private RecyclerView.LayoutManager userLayoutManager;
     private UserAdapter userAdapter;
+    private String userName;
 
-    FirebaseAuth mAuth;
+    private FirebaseAuth mAuth;
     private DatabaseReference userDBRef;
     private ChildEventListener userChildDBEventListener;
 
@@ -43,9 +45,11 @@ public class UserListActivity extends AppCompatActivity {
 
         createFirebaseSetup();
 
+        createUserListActivitySetup();
+
         attachUserDBRefListener();
 
-        buildRecyclerView();
+
 
     }
 
@@ -55,13 +59,13 @@ public class UserListActivity extends AppCompatActivity {
     }
 
     private void attachUserDBRefListener() {
-        if(userChildDBEventListener == null){
+        if (userChildDBEventListener == null) {
             userChildDBEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
                     User user = dataSnapshot.getValue(User.class);
 
-                    if(!user.getId().equals(mAuth.getCurrentUser().getUid())){
+                    if (!user.getId().equals(mAuth.getCurrentUser().getUid())) {
                         user.setAvatarResource(R.drawable.ic_person_white_50dp);
                         userList.add(user);
                         userAdapter.notifyDataSetChanged();
@@ -92,15 +96,42 @@ public class UserListActivity extends AppCompatActivity {
         }
     }
 
-    private void buildRecyclerView(){
+    private void createUserListActivitySetup() {
         userList = new ArrayList<>();
         userAdapter = new UserAdapter(userList);
+
         userLayoutManager = new LinearLayoutManager(this);
 
         userRecyclerView = findViewById(R.id.user_list_recycler_view);
         userRecyclerView.setHasFixedSize(true);
         userRecyclerView.setLayoutManager(userLayoutManager);
         userRecyclerView.setAdapter(userAdapter);
+
+        Intent intent = getIntent();
+        if (intent != null) {
+            userName = intent.getStringExtra(userName);
+        }
+
+        userAdapter.setOnUserClickListener(new OnUserClickListener() {
+            @Override
+            public void onUserClick(int position) {
+                goToChat(position);
+            }
+        });
+    }
+
+    private void goToChat(int recipientUserId) {
+        Intent intent = new Intent(UserListActivity.this,
+                ChatActivity.class);
+
+        intent.putExtra("recipientUserId",
+                userList.get(recipientUserId).getId());
+
+        intent.putExtra("recipientUserName",
+                userList.get(recipientUserId).getName());
+
+        intent.putExtra("userName", userName);
+        startActivity(intent);
     }
 
     @Override

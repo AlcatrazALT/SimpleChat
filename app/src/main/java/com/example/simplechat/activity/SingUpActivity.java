@@ -37,9 +37,9 @@ public class SingUpActivity extends AppCompatActivity {
 
     private boolean isSingUpModeActive = true;
 
-    FirebaseAuth mAuth;
-    FirebaseDatabase database;
-    DatabaseReference userDBReference;
+    private FirebaseAuth mAuth;
+    private FirebaseDatabase database;
+    private DatabaseReference userDBReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
