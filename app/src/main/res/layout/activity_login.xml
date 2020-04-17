@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".login.SingUpActivity"
+    tools:context=".activity.SingUpActivity"
     android:background="@android:color/black"
     android:padding="20dp">
 
@@ -22,7 +22,7 @@
 
     <EditText
         android:id="@+id/email_edit_text"
-        android:background="@drawable/rounded_edittext"
+        android:background="@drawable/rounded_shape"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
         android:hint="@string/email"
@@ -35,7 +35,7 @@
 
     <EditText
         android:id="@+id/password_edit_text"
-        android:background="@drawable/rounded_edittext"
+        android:background="@drawable/rounded_shape"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
         android:hint="@string/password"
@@ -48,7 +48,7 @@
 
     <EditText
         android:id="@+id/confirm_password_edit_text"
-        android:background="@drawable/rounded_edittext"
+        android:background="@drawable/rounded_shape"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
         android:hint="@string/confirm_password"
@@ -61,7 +61,7 @@
 
     <EditText
         android:id="@+id/name_edit_text"
-        android:background="@drawable/rounded_edittext"
+        android:background="@drawable/rounded_shape"
         android:paddingStart="5dp"
         android:paddingEnd="5dp"
         android:hint="@string/name"
@@ -76,7 +76,7 @@
         android:id="@+id/sign_up_button"
         android:layout_below="@id/name_edit_text"
         android:layout_marginTop="50dp"
-        android:background="@drawable/rounded_edittext"
+        android:background="@drawable/rounded_shape"
         android:textColor="@android:color/white"
         android:layout_centerHorizontal="true"
         android:layout_width="wrap_content"

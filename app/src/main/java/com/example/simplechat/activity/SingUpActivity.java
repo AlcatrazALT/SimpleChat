@@ -1,4 +1,4 @@
-package com.example.simplechat.login;
+package com.example.simplechat.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +13,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.example.simplechat.MainActivity;
 import com.example.simplechat.R;
 import com.example.simplechat.user.User;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -36,9 +35,9 @@ public class SingUpActivity extends AppCompatActivity {
     private TextView tapToSingInTextView;
     private String userName;
 
-    private boolean isSingUpModeActive;
+    private boolean isSingUpModeActive = true;
 
-    private FirebaseAuth mAuth;
+    FirebaseAuth mAuth;
     FirebaseDatabase database;
     DatabaseReference userDBReference;
 
@@ -49,7 +48,7 @@ public class SingUpActivity extends AppCompatActivity {
 
         createFirebaseSetup();
 
-        createActivitySetup();
+        createSingUpActivitySetup();
 
         useSingUpButton();
 
@@ -76,11 +75,11 @@ public class SingUpActivity extends AppCompatActivity {
     private void forwardSingInUserToChat() {
         if (mAuth.getCurrentUser() != null) {
             startActivity(new Intent(SingUpActivity.this,
-                    MainActivity.class));
+                    UserListActivity.class));
         }
     }
 
-    private void createActivitySetup() {
+    private void createSingUpActivitySetup() {
         emailEditText = findViewById(R.id.email_edit_text);
         passwordEditText = findViewById(R.id.password_edit_text);
         confirmPasswordEditText = findViewById(R.id.confirm_password_edit_text);
@@ -176,7 +175,7 @@ public class SingUpActivity extends AppCompatActivity {
 
     private void bindUserName() {
         Intent intent = new Intent(SingUpActivity.this,
-                MainActivity.class);
+                UserListActivity.class);
 
         intent.putExtra("userName",
                 nameEditText.getText().toString().trim());
@@ -184,11 +183,10 @@ public class SingUpActivity extends AppCompatActivity {
     }
 
     private void createUser(FirebaseUser firebaseUser) {
-        User user = new User(
-                firebaseUser.getUid(),
-                firebaseUser.getEmail(),
-                nameEditText.getText().toString().trim());
-
+        User user = new User();
+        user.setId(firebaseUser.getUid());
+        user.setEmail(firebaseUser.getEmail());
+        user.setName(nameEditText.getText().toString().trim());
         userDBReference.push().setValue(user);
     }
 

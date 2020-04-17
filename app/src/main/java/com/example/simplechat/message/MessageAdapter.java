@@ -41,6 +41,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         Message message = getItem(position);
 
         boolean isTextSend = message.getImageUlr() == null;
+
         if(isTextSend){
             photoImageView.setVisibility(View.GONE);
             messageTextView.setVisibility(View.VISIBLE);

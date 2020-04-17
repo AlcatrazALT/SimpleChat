@@ -22,4 +22,5 @@
     <string name="tap_to_sing_in"><u>Tap to Sing In</u></string>
     <string name="confirm_password">Confirm Password</string>
     <string name="sing_out">Sing Out</string>
+    <string name="user_name">User Name</string>
 </resources>

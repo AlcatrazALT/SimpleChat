@@ -9,7 +9,7 @@
     android:orientation="vertical"
     android:padding="8dp"
     android:background="@android:color/black"
-    tools:context=".MainActivity">
+    tools:context=".activity.ChatActivity">
 
     <ListView
         android:id="@+id/send_message_list_view"
@@ -23,7 +23,7 @@
 
     <LinearLayout
         android:id="@+id/send_message_linear_layout"
-        android:background="@drawable/rounded_edittext"
+        android:background="@drawable/rounded_shape"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
 
         <EditText
             android:id="@+id/message_edit_text"
-            android:background="@drawable/rounded_edittext"
+            android:background="@drawable/rounded_shape"
             android:paddingLeft="5dp"
             android:hint="@string/message"
             android:textColorHint="@android:color/white"

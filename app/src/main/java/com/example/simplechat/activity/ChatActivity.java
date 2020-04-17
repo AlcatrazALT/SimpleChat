@@ -1,4 +1,4 @@
-package com.example.simplechat;
+package com.example.simplechat.activity;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,7 +20,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
-import com.example.simplechat.login.SingUpActivity;
+import com.example.simplechat.R;
 import com.example.simplechat.message.Message;
 import com.example.simplechat.message.MessageAdapter;
 import com.example.simplechat.user.User;
@@ -40,7 +40,7 @@ import com.google.firebase.storage.UploadTask;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class ChatActivity extends AppCompatActivity {
     private static final int RC_IMAGE_PICKER = 300;
 
     private ListView messageListView;
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_chat);
 
         createMainActivitySetup();
 
@@ -84,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void createFirebaseStorageSetup() {
+        firebaseStorage = FirebaseStorage.getInstance();
         chatImageStorageRef = firebaseStorage.getReference().child("chat_images");
     }
 
@@ -303,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.sing_out) {
             FirebaseAuth.getInstance().signOut();
-            startActivity(new Intent(MainActivity.this, SingUpActivity.class));
+            startActivity(new Intent(ChatActivity.this, SingUpActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
